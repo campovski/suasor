@@ -6,4 +6,4 @@ from django.http import HttpResponse
 
 
 def index(request):
-	return HttpResponse("Working ok")
+	return HttpResponse("Strigili ok")

@@ -16,3 +16,12 @@ deactivate
 
 # Create database and user admin_rimor.
 sudo -u postgres psql -f "$PWD/praeparo/memoria/init.sql"
+
+# Migrate models and populate log types via django.
+source venv/bin/activate
+cd suasor/
+python manage.py makemigrations
+python manage.py migrate
+python manage.py populate_log_types
+deactivate
+cd ..

@@ -13,13 +13,13 @@ class Command(BaseCommand):
 		type = LogType(name='ERROR')
 		type.save()
 
-        type = LogType(name='INFO')
+		type = LogType(name='INFO')
 		type.save()
 
-        type = LogType(name='DEBUG')
+		type = LogType(name='DEBUG')
 		type.save()
 
-        type = LogType(name='WARNING')
+		type = LogType(name='WARNING')
 		type.save()
 
 	def handle(self, *args, **options):

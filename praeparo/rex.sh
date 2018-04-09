@@ -21,6 +21,7 @@ sudo -u postgres psql -f "$PWD/praeparo/memoria/init.sql"
 source venv/bin/activate
 cd suasor/
 python manage.py makemigrations
+python manage.py makemigrations suasor
 python manage.py migrate
 python manage.py populate_log_types
 deactivate

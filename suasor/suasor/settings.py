@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ['localhost']
 INSTALLED_APPS = [
     'suasor',
     'strigili',
-    'auxilium',
     'praedicto',
     'django.contrib.admin',
     'django.contrib.auth',

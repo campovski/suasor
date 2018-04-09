@@ -33,7 +33,6 @@ class LogType(models.Model):
     name = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'log_type'
 
 

@@ -15,7 +15,6 @@ class Friendship(models.Model):
     user2 = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'friendship'
 
 
@@ -27,7 +26,6 @@ class Log(models.Model):
     description = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'log'
 
 
@@ -46,7 +44,6 @@ class Rating(models.Model):
     trainset = models.NullBooleanField()
 
     class Meta:
-        managed = False
         db_table = 'rating'
 
 
@@ -62,5 +59,4 @@ class UserData(models.Model):
     in_relationship = models.NullBooleanField()
 
     class Meta:
-        managed = False
         db_table = 'user_data'

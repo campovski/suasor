@@ -115,7 +115,7 @@ def strigili_princeps(session, user_id):
 		user_data = None
 
 	# Rescrap data if requested or if data is not found in database.
-	if _rescrap_known_data or user_data is None:
+	if rescrap or user_data is None:
 		PERSON_DATA[user_id] = {
 			'name': None,
 			'picture_url': None,
@@ -128,7 +128,7 @@ def strigili_princeps(session, user_id):
 		}
 
 		# Get about page which is located at URL_BASE/user_id/about.
-		r = s.get(URL_BASE + user_id + '/about')
+		r = session.get(URL_BASE + user_id + '/about')
 		html_code = r.text.encode('utf8')
 
 		# Write page to file for debugging purposes.
@@ -325,7 +325,7 @@ def strigili(username, password, depth, roots, rescrap):
 			for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
 				if DEBUG:
 					print 'Getting data for {}'.format(user_id)
-				strigili_princeps(s, user_id)
+				strigili_princeps(s, user_id, rescrap)
 				number_of_people_through_sp += 1
 
 		# Now that we hopefully have all data extracted, we can get the profile pictures.

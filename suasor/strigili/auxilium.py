@@ -5,10 +5,12 @@ import json
 import datetime
 import os
 import threading
+
+from django.http import HttpResponse
+
 from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE, DIR_DATA_LOG
 from suasor.models import Friendship, UserData
 import suasor.auxilium
-from django.http import HttpResponse
 
 # URLs
 URL_BASE = 'https://www.facebook.com/'
@@ -20,30 +22,6 @@ PEOPLE_DISCOVERED = set()
 
 # A dictionary of people data we managed to scrap.
 PERSON_DATA = {}
-
-
-"""
-	Sets up directory structure if it does not exist yet.
-	Must be called at the very beginning of execution of __main__.
-"""
-def setup_directories():
-	created = False
-	if not os.path.isdir(DIR_DATA):
-		os.mkdir(DIR_DATA)
-		created = True
-	if not os.path.isdir(DIR_DATA_DEBUG):
-		os.mkdir(DIR_DATA_DEBUG)
-		created = True
-	if not os.path.isdir(DIR_DATA_PEOPLE):
-		os.mkdir(DIR_DATA_PEOPLE)
-		created = True
-	if not os.path.isdir(DIR_DATA_IMAGES):
-		os.mkdir(DIR_DATA_IMAGES)
-		created = True
-	if not os.path.isdir(DIR_DATA_LOG):
-		os.mkdir(DIR_DATA_LOG)
-		created = True
-	return created
 
 """
 	Checks if login to Facebook has been successful (via searching for 'Recover Your Account'
@@ -268,18 +246,8 @@ def strigili(username, password, depth, roots, rescrap):
 	_custom_search_roots = None
 	if roots:
 		_custom_search_roots = roots.split(',')
-
-	# Setup directories.
-	if DEBUG:
-		print 'Setting up directories...'
-	try:
-		setup_directories()
-	except:
 		if DEBUG:
-			print 'FAILED!'
-		return HttpResponse("Internal Error: Could not create directories.")
-	if DEBUG:
-		print 'SUCCESS!'
+			print 'SEARCH ROOTS = {}'.format(_custom_search_roots)
 
 	# Everything has to be done in one session so we do not lose login.
 	with requests.session() as s:
@@ -336,7 +304,8 @@ def strigili(username, password, depth, roots, rescrap):
 		if DEBUG:
 			print 'Getting profile pictures...'
 		get_profile_pictures()
-
+		print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)
+		print '\n======================================================\n'
 		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))
 
 

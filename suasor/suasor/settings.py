@@ -112,7 +112,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# Directories, used only for debugging!
+# Directories, used mainly for debugging (except imaginibus)!
 DIR_DATA = os.path.join(BASE_DIR, 'indicina')
 DIR_DATA_DEBUG = os.path.join(DIR_DATA, 'tmp')
 DIR_DATA_PEOPLE = os.path.join(DIR_DATA, 'persona')

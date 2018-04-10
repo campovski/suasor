@@ -7,6 +7,14 @@ sudo apt-get install -y python-dev python-pip
 sudo apt-get install -y postgresql postgresql-contrib
 sudo apt-get install -y libpq-dev
 
+# Create directories for indicina.
+mkdir "$PWD/suasor/indicina"
+mkdir "$PWD/suasor/indicina/tmp"
+mkdir "$PWD/suasor/indicina/persona"
+mkdir "$PWD/suasor/indicina/imaginibus"
+mkdir "$PWD/suasor/indicina/diarium"
+sudo chmod -R 777 indicina
+
 # Activate virtualenv and install Python modules.
 pip install virtualenv
 virtualenv venv

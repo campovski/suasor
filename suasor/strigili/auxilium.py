@@ -60,7 +60,7 @@ def is_valid_login(text):
 	@return your Facebook ID
 """
 def get_your_id(text):
-	pattern = re.compile(r'<a class=".*?" accesskey="2" data-gt=".*?" href="https://www.facebook.com/(?P<your_id>.*?)" title=')
+	pattern = re.compile(r'<a accesskey="2" data-gt=".*href="https://www.facebook.com/(?P<your_id>.*?)" title=')
 	match = re.search(pattern, text)
 	return match.group('your_id')
 
@@ -83,7 +83,7 @@ def get_friends(session, user_id):
 	# Get friends page of a person.
 	friends_page = session.get(URL_BASE + user_id + '/friends')
 
-	regex = '<div class="fsl fwb fcb".*?<a href="' + URL_BASE + '(?P<friends_id>.*?)\\?'
+	regex = '<a class=".+?" href="' + URL_BASE + '(?P<friends_id>.+?)\\?'
 	pattern = re.compile(r'{}'.format(regex))
 	for match in re.findall(pattern, friends_page.text.encode('utf8')):
 		if match != 'profile.php':
@@ -100,7 +100,7 @@ def get_friends(session, user_id):
 """
 def strigili_princeps(session, user_id):
 	# Patterns used in regex searches to extract data.
-	pattern_name = re.compile(r'href="{0}{1}">(?P<name>.*?)</a>'.format(URL_BASE, user_id))
+	pattern_name = re.compile(r'href="{0}{1}">(?P<name>.*?)<'.format(URL_BASE, user_id))
 	pattern_picture_url = re.compile(r'<img class="profilePic.*?src="(?P<picture_url>.*?)"')
 	pattern_birthday = re.compile(r'Birthday</span.*?<div>(?P<birthday>.*?)</div>')
 	pattern_study = re.compile(r'Studie(.*?>)?(?P<study>.*?)</')

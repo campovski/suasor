@@ -1,0 +1,37 @@
+<html>
+
+{% load static %}
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial scale=1">
+	<title>Suasor -- Strigili</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/header.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
+</head>
+<body>
+
+  <div class="menuWrap">
+    <div id="logo"></div>
+
+    <a href="#">
+      <div class="menuItem">
+
+      </div>
+    </a>
+  </div>
+
+  <div id="content">
+    <div class="part">
+      <form method="POST">
+        {{ csrf_token }}
+        <p class="formInfo">Facebook credentials for searching people...</p>
+        {{ form }}
+        <input type="button" value="Search" onclick="location.href='{% url 'strigili:search' %}'">
+    </div>
+  </div>
+
+</body>
+
+</html>

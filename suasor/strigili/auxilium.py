@@ -98,7 +98,7 @@ def get_friends(session, user_id):
 	@param session: Current session
 	@param user_id: Scraping data for this user
 """
-def strigili_princeps(session, user_id):
+def strigili_princeps(session, user_id, rescrap):
 	# Patterns used in regex searches to extract data.
 	pattern_name = re.compile(r'href="{0}{1}">(?P<name>.*?)<'.format(URL_BASE, user_id))
 	pattern_picture_url = re.compile(r'<img class="profilePic.*?src="(?P<picture_url>.*?)"')

@@ -1,4 +1,7 @@
 from .models import Log, LogType
+from .settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE, DIR_DATA_LOG
+
+import datetime
 
 """
 	Writes information about error that occured (like name or image could not be extracted).

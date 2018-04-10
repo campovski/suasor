@@ -5,7 +5,7 @@ import json
 import datetime
 import os
 import threading
-from suasor.settings import DEBUG, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
+from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE, DIR_DATA_LOG
 from suasor.models import Friendship, UserData
 import suasor.auxilium
 from django.http import HttpResponse
@@ -245,16 +245,6 @@ def get_profile_pictures():
 	@return None if wrong credentials, False if failed to create dirs, else number of scrapped people
 """
 def strigili(username, password, depth, roots, rescrap):
-	import requests
-	import re
-	import sys
-	import json
-	import datetime
-	from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
-	from suasor.models import Friendship, UserData
-	import suasor.auxilium
-	from django.http import HttpResponse
-
 	# Data that needs to be passed in Facebook login form. It might not all be needed
 	# but better safe than sorry.
 	LOGIN_FORM_DATA = {

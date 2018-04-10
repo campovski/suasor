@@ -250,7 +250,7 @@ def strigili(username, password, depth, roots, rescrap):
 	import sys
 	import json
 	import datetime
-	from suasor.settings import DEBUG, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
+	from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
 	from suasor.models import Friendship, UserData
 	import suasor.auxilium
 	from django.http import HttpResponse
@@ -279,21 +279,33 @@ def strigili(username, password, depth, roots, rescrap):
 		_custom_search_roots = roots.split(',')
 
 	# Setup directories.
+	if DEBUG:
+		print 'Setting up directories...'
 	try:
 		setup_directories()
 	except:
+		if DEBUG:
+			print 'FAILED!'
 		return HttpResponse("Internal Error: Could not create directories.")
+	if DEBUG:
+		print 'SUCCESS!'
 
 	# Everything has to be done in one session so we do not lose login.
 	with requests.session() as s:
 		# Get session cookie.
 		s.get(URL_BASE)
 
+		if DEBUG:
+			print 'Loging in...'
 		# Login.
 		r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
 
 		if not is_valid_login(r.text):
+			if DEBUG:
+				print 'Failed to login!'
 			return HttpResponse("Login Error: Wrong Facebook credentials.")
+		if DEBUG:
+			print 'Login successful!'
 
 		# Save the page to file for debugging purposes.
 		if DEBUG:
@@ -309,6 +321,9 @@ def strigili(username, password, depth, roots, rescrap):
 			my_id = get_your_id(r.text.encode('utf8'))
 			PEOPLE_DISCOVERED.add(my_id)
 
+		if DEBUG:
+			print 'PEOPLE_DISCOVERED = {}'.format(PEOPLE_DISCOVERED)
+
 		# Get friends to desired depth. Depth + 1 because on depth 0 is the head, that is you.
 		number_of_people_through_sp = 0
 		for i in range(depth+1):
@@ -317,6 +332,8 @@ def strigili(username, password, depth, roots, rescrap):
 			# Search only through people that are not you to save some time because I
 			# guess you are not searching for yourself or your dummy profile.
 			for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
+				if DEBUG:
+					print 'Getting data for {}'.format(user_id)
 				strigili_princeps(s, user_id)
 				number_of_people_through_sp += 1
 
@@ -325,6 +342,8 @@ def strigili(username, password, depth, roots, rescrap):
 		# run analysis in separate thread so that we can stop scraping data if we already find a match.
 		# For now, we will scrap all data first, then get profile pictures and at the end return the top
 		# matches, so not only the best match, but potential matches.
+		if DEBUG:
+			print 'Getting profile pictures...'
 		get_profile_pictures()
 
 		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))

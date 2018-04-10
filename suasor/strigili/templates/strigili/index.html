@@ -28,7 +28,7 @@
         {% csrf_token %}
         <p class="formInfo">Facebook credentials for searching people...</p>
         {{ form }}
-        <input type="button" value="Search" onclick="location.href='{% url 'strigili:index' %}'">
+        <input type="submit" value="Search">
     </div>
   </div>
 

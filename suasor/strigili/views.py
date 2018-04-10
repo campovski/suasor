@@ -25,9 +25,10 @@ def index(request):
 
 			return search(request)
 
-		return render(request, 'strigili/index.html', { 'form': form })
+	else:
+		form = LoginForm()
 
-	return HttpResponse("Error, bad request!")
+	return render(request, 'strigili/index.html', { 'form': form })
 
 def search(request):
 	return HttpResponse("Your request is being processed... We will notify you when it's done!")

@@ -259,7 +259,7 @@ def strigili(username, password, depth, roots, rescrap):
 		'ab_test_data': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 		'locale': 'en_US',
 		'login_source': 'login_bluebar',
-		'prefill_contact_point': EMAIL,
+		'prefill_contact_point': username,
 		'prefill_source': 'browser_dropdown',
 		'prefill_type': 'password',
 		'skstamp': 'eyJyb3VuZHMiOjUsInNlZWQiOiI2ZDAxZDcwZjIwZjkyNWU1OTA2ZDY2ZWUwOTQ2ODM4YyIsInNlZWQyIjoiNjllYTg2MjhkODMyMGUyNmIxNDNhOTkwNjFmMmY4ZDgiLCJoYXNoIjoiM2I4OWZlMTk5OGJmNjEwYzllNjI1ZjNkMTQ4YzhjOTIiLCJoYXNoMiI6IjBjMjU4ZjU5NmI5NGYyNGU0MDMwZGQ1MWZiMDJiODlhIiwidGltZV90YWtlbiI6ODQ4MDAsInN1cmZhY2UiOiJsb2dpbiJ9'

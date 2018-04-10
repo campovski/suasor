@@ -13,7 +13,7 @@ mkdir "$PWD/suasor/indicina/tmp"
 mkdir "$PWD/suasor/indicina/persona"
 mkdir "$PWD/suasor/indicina/imaginibus"
 mkdir "$PWD/suasor/indicina/diarium"
-sudo chmod -R 777 indicina
+sudo chmod -R 777 "$PWD/suasor/indicina"
 
 # Activate virtualenv and install Python modules.
 pip install virtualenv

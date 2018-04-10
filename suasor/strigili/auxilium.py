@@ -83,7 +83,7 @@ def get_friends(session, user_id):
 	# Get friends page of a person.
 	friends_page = session.get(URL_BASE + user_id + '/friends')
 
-	regex = '<a class=".+?" href="' + URL_BASE + '(?P<friends_id>.+?)\\?'
+	regex = '<a class=".+?" href="' + URL_BASE + '(?P<friends_id>[a-zA-Z.0-9])\\?'
 	pattern = re.compile(r'{}'.format(regex))
 	for match in re.findall(pattern, friends_page.text.encode('utf8')):
 		if match != 'profile.php':

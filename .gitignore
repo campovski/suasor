@@ -1,5 +1,10 @@
+################################################################################
 # Because fuck you Apple
 .DS_Store
+
+# Omit generated files
+indicina/
+################################################################################
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

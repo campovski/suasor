@@ -1,4 +1,5 @@
 import os
+import threading
 
 # URLs
 URL_BASE = 'https://www.facebook.com/'
@@ -10,6 +11,7 @@ PEOPLE_DISCOVERED = set()
 
 # A dictionary of people data we managed to scrap.
 PERSON_DATA = {}
+
 
 """
 	Sets up directory structure if it does not exist yet.
@@ -242,6 +244,7 @@ def strigili(username, password, depth, roots, rescrap):
 	from suasor.settings import DEBUG, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
 	from suasor.models import Friendship, UserData
 	import suasor.auxilium
+	from django.http import HttpResponse
 
 	# Data that needs to be passed in Facebook login form. It might not all be needed
 	# but better safe than sorry.
@@ -270,7 +273,7 @@ def strigili(username, password, depth, roots, rescrap):
 	try:
 		setup_directories()
 	except:
-		return False
+		return HttpResponse("Internal Error: Could not create directories.")
 
 	# Everything has to be done in one session so we do not lose login.
 	with requests.session() as s:
@@ -281,7 +284,7 @@ def strigili(username, password, depth, roots, rescrap):
 		r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
 
 		if not is_valid_login(r.text):
-			return None
+			return HttpResponse("Login Error: Wrong Facebook credentials.")
 
 		# Save the page to file for debugging purposes.
 		if DEBUG:
@@ -315,4 +318,25 @@ def strigili(username, password, depth, roots, rescrap):
 		# matches, so not only the best match, but potential matches.
 		get_profile_pictures()
 
-		return number_of_people_through_sp
+		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))
+
+
+"""
+    Extend threading.Thread to remember the number of processed people.
+"""
+class StrigiliThread(threading.Thread):
+
+    def __init__(self, request, username, password, depth, roots, rescrap):
+		self.request = request
+		self.username = username
+		self.password = password
+		self.depth = depth
+		self.roots = roots
+		self.rescrap = rescrap
+        self.number_of_people_through_sp = None
+        super(StrigiliThread, self).__init__()
+
+    def run(self):
+		print 'StrigiliThread: STARTED!'
+        self.number_of_people_through_sp = strigili(self.username, self.password, self.depth, \
+			self.roots, self.rescrap)

@@ -10,8 +10,10 @@ sudo apt-get install -y libpq-dev
 # Activate virtualenv and install Python modules.
 pip install virtualenv
 virtualenv venv
+sudo chmod -R 777 venv
 source venv/bin/activate
 python -m pip install "django<2" psycopg2
+pip install requests
 deactivate
 
 # Create database and user admin_rimor.

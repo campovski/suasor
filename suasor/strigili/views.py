@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 from .forms import LoginForm
-from .auxilium import strigili
+from .auxilium import StrigiliThread
 
 
 def index(request):
@@ -20,15 +20,13 @@ def index(request):
 			roots = form.cleaned_data['roots']
 			rescrap = form.cleaned_data['rescrap']
 
-			thread = threading.Thread(target=strigili, args=[username, password, depth, roots, rescrap])
+			thread = StrigiliThread(request, username, password, depth, roots, rescrap)
 			thread.start()
 
-			return search(request)
+			return HttpResponse("""<b>Please do not close this tab or your browser.</b>\n
+				Your request is being processed...\nYou will be redirected when process finishes.""")
 
 	else:
 		form = LoginForm()
 
 	return render(request, 'strigili/index.html', { 'form': form })
-
-def search(request):
-	return HttpResponse("Your request is being processed... We will notify you when it's done!")

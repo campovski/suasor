@@ -11,9 +11,9 @@ def _log(log_type, package, at, desc):
 		with open(os.path.join(DIR_DATA_LOG, '{}.log'.format(package)), 'a') as f:
 			f.write('[{0}] @ {1} @ {2}: {3}\n'.format(log_type, log_time, at, desc))
 
-	log = Log()
-	log.at_time = log_time
-	log.type = LogType.objects.get(name=log_type)
+    log = Log()
+    log.at_time = log_time
+    log.type = LogType.objects.get(name=log_type)
     log.in_package = package
     log.in_function = at
     log.description = desc

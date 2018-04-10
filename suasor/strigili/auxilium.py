@@ -325,18 +325,17 @@ def strigili(username, password, depth, roots, rescrap):
     Extend threading.Thread to remember the number of processed people.
 """
 class StrigiliThread(threading.Thread):
-
-    def __init__(self, request, username, password, depth, roots, rescrap):
+	def __init__(self, request, username, password, depth, roots, rescrap):
 		self.request = request
 		self.username = username
 		self.password = password
 		self.depth = depth
 		self.roots = roots
 		self.rescrap = rescrap
-        self.number_of_people_through_sp = None
-        super(StrigiliThread, self).__init__()
+		self.number_of_people_through_sp = None
+		super(StrigiliThread, self).__init__()
 
-    def run(self):
+	def run(self):
 		print 'StrigiliThread: STARTED!'
-        self.number_of_people_through_sp = strigili(self.username, self.password, self.depth, \
+		self.number_of_people_through_sp = strigili(self.username, self.password, self.depth, \
 			self.roots, self.rescrap)

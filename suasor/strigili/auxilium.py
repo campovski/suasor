@@ -4,25 +4,6 @@ import os
 URL_BASE = 'https://www.facebook.com/'
 URL_POST_LOGIN = 'https://www.facebook.com/login.php?login_attempt=1&lwv=111'
 
-# Data that needs to be passed in Facebook login form. It might not all be needed
-# but better safe than sorry.
-LOGIN_FORM_DATA = {
-	'lsd': 'AVoWxZto',
-	'email': EMAIL,
-	'pass': PASSWORD,
-	'timezone': -60,
-	'lgndim': 'eyJ3IjoxNDQwLCJoIjo5MDAsImF3IjoxNDQwLCJhaCI6ODc0LCJjIjoyNH0=',
-	'lgnrnd': '005012__T_v',
-	'lgnjs': 1516870214,
-	'ab_test_data': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-	'locale': 'en_US',
-	'login_source': 'login_bluebar',
-	'prefill_contact_point': EMAIL,
-	'prefill_source': 'browser_dropdown',
-	'prefill_type': 'password',
-	'skstamp': 'eyJyb3VuZHMiOjUsInNlZWQiOiI2ZDAxZDcwZjIwZjkyNWU1OTA2ZDY2ZWUwOTQ2ODM4YyIsInNlZWQyIjoiNjllYTg2MjhkODMyMGUyNmIxNDNhOTkwNjFmMmY4ZDgiLCJoYXNoIjoiM2I4OWZlMTk5OGJmNjEwYzllNjI1ZjNkMTQ4YzhjOTIiLCJoYXNoMiI6IjBjMjU4ZjU5NmI5NGYyNGU0MDMwZGQ1MWZiMDJiODlhIiwidGltZV90YWtlbiI6ODQ4MDAsInN1cmZhY2UiOiJsb2dpbiJ9'
-}
-
 # A set of all people we have found among friends of friends. We create a set so that every
 # person will be checked only once.
 PEOPLE_DISCOVERED = set()
@@ -262,6 +243,25 @@ def strigili(username, password, depth, roots, rescrap):
 	from suasor.models import Friendship, UserData
 	import suasor.auxilium
 
+	# Data that needs to be passed in Facebook login form. It might not all be needed
+	# but better safe than sorry.
+	LOGIN_FORM_DATA = {
+		'lsd': 'AVoWxZto',
+		'email': username,
+		'pass': password,
+		'timezone': -60,
+		'lgndim': 'eyJ3IjoxNDQwLCJoIjo5MDAsImF3IjoxNDQwLCJhaCI6ODc0LCJjIjoyNH0=',
+		'lgnrnd': '005012__T_v',
+		'lgnjs': 1516870214,
+		'ab_test_data': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+		'locale': 'en_US',
+		'login_source': 'login_bluebar',
+		'prefill_contact_point': EMAIL,
+		'prefill_source': 'browser_dropdown',
+		'prefill_type': 'password',
+		'skstamp': 'eyJyb3VuZHMiOjUsInNlZWQiOiI2ZDAxZDcwZjIwZjkyNWU1OTA2ZDY2ZWUwOTQ2ODM4YyIsInNlZWQyIjoiNjllYTg2MjhkODMyMGUyNmIxNDNhOTkwNjFmMmY4ZDgiLCJoYXNoIjoiM2I4OWZlMTk5OGJmNjEwYzllNjI1ZjNkMTQ4YzhjOTIiLCJoYXNoMiI6IjBjMjU4ZjU5NmI5NGYyNGU0MDMwZGQ1MWZiMDJiODlhIiwidGltZV90YWtlbiI6ODQ4MDAsInN1cmZhY2UiOiJsb2dpbiJ9'
+	}
+
 	# Get custom search roots
 	if roots:
 		_custom_search_roots = roots.split(',')
@@ -278,7 +278,7 @@ def strigili(username, password, depth, roots, rescrap):
 		s.get(URL_BASE)
 
 		# Login.
-		r = s.post(username, password)
+		r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
 
 		if not is_valid_login(r.text):
 			return None

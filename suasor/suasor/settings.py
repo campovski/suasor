@@ -112,4 +112,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# Directories, used only for debugging!
+DIR_DATA = os.path.join(BASE_DIR, 'indicina')
+DIR_DATA_DEBUG = os.path.join(DIR_DATA, 'tmp')
+DIR_DATA_PEOPLE = os.path.join(DIR_DATA, 'persona')
+DIR_DATA_IMAGES = os.path.join(DIR_DATA, 'imaginibus')
+DIR_DATA_LOG = os.path.join(DIR_DATA, 'diarium')
+
 from local_settings import *

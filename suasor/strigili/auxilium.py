@@ -1,17 +1,4 @@
 import os
-import sys
-
-# Append directory of Rimor to System Path variable so that we can import our modules.
-sys.path.append(os.getcwd())
-
-# Login credentials. It is advised to create a dummy user that only has actual you as
-# a friend. This way you are not putting your true credentials into a plain text file.
-# If you do this, do not forget to increase depth by 1.
-EMAIL = ''
-PASSWORD = ''
-
-# Load login credentials from separate file.
-from auxilium.documentorum import EMAIL, PASSWORD
 
 # URLs
 URL_BASE = 'https://www.facebook.com/'
@@ -43,15 +30,6 @@ PEOPLE_DISCOVERED = set()
 # A dictionary of people data we managed to scrap.
 PERSON_DATA = {}
 
-# Directories, used only for debugging!
-DIR_APP = os.getcwd()
-DIR_DATA = os.path.join(DIR_APP, 'indicina')
-DIR_DATA_DEBUG = os.path.join(DIR_DATA, 'tmp')
-DIR_DATA_PEOPLE = os.path.join(DIR_DATA, 'persona')
-DIR_DATA_IMAGES = os.path.join(DIR_DATA, 'imaginibus')
-DIR_DATA_LOG = os.path.join(DIR_DATA, 'diarium')
-
-
 """
 	Sets up directory structure if it does not exist yet.
 	Must be called at the very beginning of execution of __main__.
@@ -76,16 +54,13 @@ def setup_directories():
 	return created
 
 """
-	Writes information about error that occured (like name or image could not be extracted).
-	@param at: The name of function that this error occured in
-	@param desc: Description of error
+	Checks if login to Facebook has been successful (via searching for 'Recover Your Account'
+	in response HTML).
+	@param text: HTML code to be searched
+	@return True if not found, else False
 """
-def _log_error(log_type, at, desc):
-	if _debug:
-		with open(os.path.join(DIR_DATA_LOG, 'strigili.log'), 'a') as f:
-			f.write('[{0}] @ {1} @ {2}: {3}\n'.format(log_type, datetime.datetime.now(), at, desc))
-	if conn:
-		auxilium.memoria.log(conn, log_type, 'strigili', at, desc)
+def is_valid_login(text):
+	return 'Recover Your Account' not in text
 
 """
 	Function that extracts YOUR ID from main Facebook page.
@@ -142,7 +117,10 @@ def strigili_princeps(session, user_id):
 	# TODO pattern_relationship (with)
 
 	# Get data on user from database or None if user is not in database.
-	user_data = auxilium.memoria.get_user_data(conn, user_id)
+	try:
+		user_data = UserData.objects.get(user_id=user_id)
+	except UserData.DoesNotExist:
+		user_data = None
 
 	# Rescrap data if requested or if data is not found in database.
 	if _rescrap_known_data or user_data is None:
@@ -162,7 +140,7 @@ def strigili_princeps(session, user_id):
 		html_code = r.text.encode('utf8')
 
 		# Write page to file for debugging purposes.
-		if _debug:
+		if DEBUG:
 			with open(os.path.join(DIR_DATA_DEBUG, '{0}.html'.format(user_id)), 'w') as f:
 				f.write(html_code)
 
@@ -171,14 +149,14 @@ def strigili_princeps(session, user_id):
 		if result:
 			PERSON_DATA[user_id]['name'] = result.group('name')
 		else:
-			_log_error('WARNING', 'strigili_princeps', 'Couldn\'t extract name for user {}'.format(user_id))
+			_log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract name for user {}'.format(user_id))
 
 		# Search for picture which should always be present.
 		result = re.search(pattern_picture_url, html_code)
 		if result:
 			PERSON_DATA[user_id]['picture_url'] = result.group('picture_url').replace('&amp;', '&')
 		else:
-			_log_error('WARNING', 'strigili_princeps', 'Couldn\'t extract picture url for user {}'.format(user_id))
+			_log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract picture url for user {}'.format(user_id))
 
 		# Search for birthday. Might return None.
 		result = re.search(pattern_birthday, html_code)
@@ -203,19 +181,46 @@ def strigili_princeps(session, user_id):
 		# be written to database.
 		get_friends(session, user_id)
 
-		# Save data to database.
-		auxilium.memoria.save_user_data(conn, user_id, PERSON_DATA[user_id])
+		# Save data to database. Create new object if it has not been found.
+		if not user_data:
+			user_data = UserData()
+		user_data.user_id = user_id
+	    user_data.name = PERSON_DATA[user_id]['name']
+	    user_data.birthday = PERSON_DATA[user_id]['birthday']
+	    user_data.lives_in = PERSON_DATA[user_id]['lives_in']
+	    user_data.comes_from = PERSON_DATA[user_id]['from']
+	    user_data.study = PERSON_DATA[user_id]['study']
+	    user_data.picture_url = PERSON_DATA[user_id]['picture_url']
+	    # TODO user_data.married = PERSON_DATA[user_id]['married']
+	    # TODO user_data.in_relationship = PERSON_DATA[user_id]['relationship']
+		user_data.save()
+
+		# Save friends.
+		for friend in PERSON_DATA[user_id]['friends']:
+			fs = Friendship()
+			fs.user1 = user_id
+			fs.user2 = friend
+			fs.save()
 
 	# We managed to retrieve data from database.
 	else:
-		PERSON_DATA[user_id] = user_data
+		PERSON_DATA[user_id] = {
+			'name': user_data.name,
+			'picture_url': user_data.picture_url,
+			'birthday': user_data.birthday,
+			'study': user_data.study,
+			'lives_in': user_data.lives_in,
+			'from': user_data.comes_from,
+			'relationship': None,
+			'friends': list(Friendship.objects.filter(user1=user_id).values_list('user2', flat=True))
+		}
 
 		# Add user_id to PEOPLE_DISCOVERED.
 		PEOPLE_DISCOVERED.add(user_id)
 
 		# Update PEOPLE_DISCOVERED with friends read from file. If we do not do this,
 		# we cannot loop through their friends, potentially resulting in program not
-		# working if do not reload data.x
+		# working if do not reload data.
 		PEOPLE_DISCOVERED.update(PERSON_DATA[user_id]['friends'])
 
 """
@@ -224,8 +229,6 @@ def strigili_princeps(session, user_id):
 def get_profile_pictures():
 	number_of_people = len(PERSON_DATA)
 	for i, user_id in enumerate(PERSON_DATA):
-		if _verbose:
-			print '[{0} / {1}] Getting profile picture for user {2}'.format(i+1, number_of_people, user_id)
 		if PERSON_DATA[user_id]['picture_url'] is not None:
 			# Extract extension of image.
 			# Extension is probably always ".jpg" but still better to be robust.
@@ -240,94 +243,51 @@ def get_profile_pictures():
 				with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
 					f.write(picture)
 			else:
-				if _verbose:
-					print '[WARNING] Couldn\'t load image for user {}'.format(user_id)
-				_log_error('WARNING', 'get_profile_pictures', 'Couldn\'t load image for user {}'.format(user_id))
+				suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \
+					'Couldn\'t load image for user {}'.format(user_id))
 
 
 """
-	Main.
+	Main function, called from view.
+	@param username: Facebook user
+	@return None if wrong credentials, False if failed to create dirs, else number of scrapped people
 """
-if __name__ == '__main__':
+def strigili(username, password, depth, roots, rescrap):
 	import requests
 	import re
 	import sys
 	import json
 	import datetime
-	import psycopg2
-	import auxilium.memoria
+	from suasor.settings import DEBUG, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
+	from suasor.models import Friendship, UserData
+	import suasor.auxilium
 
-	# Set some variables...
-	_debug = '--debug' in sys.argv
-	_verbose = '-v' in sys.argv or '--verbose' in sys.argv
-	_rescrap_known_data = '-l' in sys.argv
-	_json_pretty_print = 4 if '-p' in sys.argv else None
-	_depth = 1
-	if '--depth' in sys.argv:
-		idx = sys.argv.index('--depth')
-		assert len(sys.argv) > idx + 1, 'Maybe missing argument to "--depth"?'
-		_depth = int(sys.argv[idx+1])
-	_custom_search_roots = []
-	if '--custom-search-roots' in sys.argv:
-		idx = sys.argv.index('--custom-search-roots')
-		assert len(sys.argv) > idx + 1, 'Maybe missing argument to "--custom-search-roots"?'
-		_custom_search_roots = sys.argv[idx+1].split(',')
+	# Get custom search roots
+	if roots:
+		_custom_search_roots = roots.split(',')
 
-	# Print some text at the start of execution.
-	print '\nStarting Rimor with following setup:'
-	print '\tdepth = {0}'.format(_depth)
-	print '\tdebug = {0}'.format(_debug)
-	print '\tverbose = {0}'.format(_verbose)
-	print '\trescraping = {0}'.format(_rescrap_known_data)
-	print '\tcustom_search_roots {0}'.format(_custom_search_roots != [])
-	if _verbose and _custom_search_roots != []:
-		print 'Custom search roots are: {}'.format(_custom_search_roots)
-	print ''
-
-	# Connect to database. If fail to do so, quit.
-	if _verbose:
-		print 'Connecting to database...'
-	conn = auxilium.memoria.connect()
-	if conn is None:
-		raise Exception('Could not connect to database! Have you set it up?')
-	if _verbose:
-		print 'Connected to database!'
-
-	# Create directories for storing data if necessary.
-	if _debug:
-		if _verbose:
-			print 'Setting up directories...'
-		setup_dir = setup_directories()
-		if _verbose:
-			if setup_dir:
-				print 'Directories set up successfully!\n'
-			else:
-				print 'Directories already exist. Skiping...\n'
-	if _verbose:
-		print 'Starting session... '
+	# Setup directories.
+	try:
+		setup_directories()
+	except:
+		return False
 
 	# Everything has to be done in one session so we do not lose login.
 	with requests.session() as s:
-		if _verbose:
-			print 'Session started!\n'
-
 		# Get session cookie.
 		s.get(URL_BASE)
-		if _verbose:
-			print 'Connecting... '
 
 		# Login.
-		r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
-		if _verbose:
-			print 'Login successful!\n'
+		r = s.post(username, password)
+
+		if not is_valid_login(r.text):
+			return None
 
 		# Save the page to file for debugging purposes.
-		if _debug:
+		if DEBUG:
 			with open(os.path.join(DIR_DATA_DEBUG, '_facebook.html'), 'w') as f:
 				f.write(r.text.encode('utf8'))
-			if _verbose:
-				print '[DEBUG] Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html'))
-			_log_error('DEBUG', 'main', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
+			_log('DEBUG', 'strigili', 'strigili', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
 
 		# Add your ID to PEOPLE_DISCOVERED as a starting point for search if no custom search
 		# roots have been specified.
@@ -335,33 +295,24 @@ if __name__ == '__main__':
 			PEOPLE_DISCOVERED.update(_custom_search_roots)
 		else:
 			my_id = get_your_id(r.text.encode('utf8'))
-			if _verbose:
-				print 'Head ID (your ID): ' + my_id
 			PEOPLE_DISCOVERED.add(my_id)
 
 		# Get friends to desired depth. Depth + 1 because on depth 0 is the head, that is you.
 		number_of_people_through_sp = 0
-		for i in range(_depth+1):
-			if _verbose:
-				print '\nCurrent depth = ' + str(i)
-
+		for i in range(depth+1):
 			# Get profile pages of every person we discovered and extract the data
 			# we can get (profile pic, name, date of birth, city, institutes, etc.).
 			# Search only through people that are not you to save some time because I
 			# guess you are not searching for yourself or your dummy profile.
 			for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
-				if _verbose:
-					print '[{0}] Getting data for user_id: '.format(number_of_people_through_sp) + user_id
 				strigili_princeps(s, user_id)
 				number_of_people_through_sp += 1
-				if _debug:
-					print json.dumps(PERSON_DATA[user_id], ensure_ascii=False, indent=_json_pretty_print)
 
 		# Now that we hopefully have all data extracted, we can get the profile pictures.
 		# Maybe it is better to get profile pictures as we search for people and at the same time
 		# run analysis in separate thread so that we can stop scraping data if we already find a match.
 		# For now, we will scrap all data first, then get profile pictures and at the end return the top
 		# matches, so not only the best match, but potential matches.
-		if _verbose:
-			print '\nGetting profile pictures...'
 		get_profile_pictures()
+
+		return number_of_people_through_sp

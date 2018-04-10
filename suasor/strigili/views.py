@@ -18,8 +18,9 @@ def index(request):
 			password = form.cleaned_data['password']
 			depth = form.cleaned_data['depth']
 			roots = form.cleaned_data['roots']
+			rescrap = form.cleaned_data['rescrap']
 
-			thread = threading.Thread(target=strigili, args=[username, password, depth, roots])
+			thread = threading.Thread(target=strigili, args=[username, password, depth, roots, rescrap])
 			thread.start()
 
 			return search(request)

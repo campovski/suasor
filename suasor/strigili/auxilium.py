@@ -1,5 +1,14 @@
+import requests
+import re
+import sys
+import json
+import datetime
 import os
 import threading
+from suasor.settings import DEBUG, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE
+from suasor.models import Friendship, UserData
+import suasor.auxilium
+from django.http import HttpResponse
 
 # URLs
 URL_BASE = 'https://www.facebook.com/'
@@ -132,14 +141,14 @@ def strigili_princeps(session, user_id):
 		if result:
 			PERSON_DATA[user_id]['name'] = result.group('name')
 		else:
-			_log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract name for user {}'.format(user_id))
+			suasor.auxilium._log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract name for user {}'.format(user_id))
 
 		# Search for picture which should always be present.
 		result = re.search(pattern_picture_url, html_code)
 		if result:
 			PERSON_DATA[user_id]['picture_url'] = result.group('picture_url').replace('&amp;', '&')
 		else:
-			_log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract picture url for user {}'.format(user_id))
+			suasor.auxilium._log('WARNING', 'strigili', 'strigili_princeps', 'Couldn\'t extract picture url for user {}'.format(user_id))
 
 		# Search for birthday. Might return None.
 		result = re.search(pattern_birthday, html_code)
@@ -290,7 +299,7 @@ def strigili(username, password, depth, roots, rescrap):
 		if DEBUG:
 			with open(os.path.join(DIR_DATA_DEBUG, '_facebook.html'), 'w') as f:
 				f.write(r.text.encode('utf8'))
-			_log('DEBUG', 'strigili', 'strigili', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
+			suasor.auxilium._log('DEBUG', 'strigili', 'strigili', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
 
 		# Add your ID to PEOPLE_DISCOVERED as a starting point for search if no custom search
 		# roots have been specified.

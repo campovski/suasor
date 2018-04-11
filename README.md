@@ -28,7 +28,6 @@ Taking care for communication between user and server is Django, the best web fr
 
 ## Setup notes
 If you want to somehow experiment with the code, first read [LICENSE](https://github.com/campovski/suasor/blob/master/LICENSE).
-Commercial use is prohibited!
 
 <hr>
 
@@ -68,3 +67,5 @@ This is the core of the program, fire up server by executing
 ```
 python manage.py runserver
 ```
+
+*Note: change* `suasor/local_settings.py` *file with proper settings.*

@@ -27,6 +27,19 @@ deactivate
 # Create database and user admin_rimor.
 sudo -u postgres psql -f "$PWD/praeparo/memoria/init.sql"
 
+# Create dummy local_settings.py file so you can instantly run the server.
+printf "SECRET_KEY = 'vsdjhv093rvo32l2mlfk32l2VJsvormkm'\n\n\
+DATABASES = {\n\
+    'default': {\n\
+      'ENGINE': 'django.db.backends.postgresql_psycopg2',\n\
+      'NAME': 'rimor_db',\n\
+      'USER': 'admin_rimor',\n\
+      'PASSWORD': 'testpwd1',\n\
+      'HOST': 'localhost',\n\
+      'PORT': ''\n\
+    }\n\
+}" > suasor/suasor/local_settings.py
+
 # Migrate models and populate log types via django.
 source venv/bin/activate
 cd suasor/

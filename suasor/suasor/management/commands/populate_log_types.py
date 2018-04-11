@@ -5,7 +5,7 @@
 #INSERT INTO log_type (name) VALUES ('WARNING');
 
 from django.core.management.base import BaseCommand
-from auxilium.models import LogType
+from suasor.models import LogType
 
 
 class Command(BaseCommand):

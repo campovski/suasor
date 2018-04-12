@@ -303,7 +303,7 @@ def strigili(username, password, depth, roots, rescrap):
 				# If exception of some sort happens, log it to database and restart strigili.
 				except Exception as e:
 					suasor.auxilium._log('ERROR', 'strigili', 'strigili', e.message)
-					strigili(username, password, depth, roots, rescrap)
+					strigili_princeps(s, user_id, rescrap)
 				number_of_people_through_sp += 1
 
 		print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)

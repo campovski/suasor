@@ -5,7 +5,7 @@ sudo apt-get update && sudo apt-get upgrade
 sudo apt-get install -y nginx
 sudo apt-get install -y python-dev python-pip
 sudo apt-get install -y postgresql postgresql-contrib
-sudo apt-get install -y libpq-dev
+sudo apt-get install -y libpq-dev libssl-dev libffi-dev
 
 # Create directories for indicina.
 mkdir "$PWD/suasor/indicina"
@@ -21,7 +21,7 @@ virtualenv venv
 sudo chmod -R 777 venv
 source venv/bin/activate
 python -m pip install "django<2" psycopg2
-pip install requests
+pip install 'requests[security]'
 deactivate
 
 # Create database and user admin_rimor.

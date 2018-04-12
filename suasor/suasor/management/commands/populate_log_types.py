@@ -1,9 +1,3 @@
-#-- Populate table "log" with different log types.
-#INSERT INTO log_type (name) VALUES ('ERROR');
-#INSERT INTO log_type (name) VALUES ('INFO');
-#INSERT INTO log_type (name) VALUES ('DEBUG');
-#INSERT INTO log_type (name) VALUES ('WARNING');
-
 from django.core.management.base import BaseCommand
 from suasor.models import LogType
 

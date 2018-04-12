@@ -297,7 +297,6 @@ def strigili(username, password, depth, roots, rescrap):
 		print '\n======================================================\n'
 		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))
 
-
 """
     Extend threading.Thread to remember the number of processed people.
 """

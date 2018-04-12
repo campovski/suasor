@@ -69,6 +69,30 @@ def get_friends(session, user_id):
 			PERSON_DATA[user_id]['friends'].append(match)
 
 """
+	Gets profile picture and saves it to DIR_DATA_IMAGES as <user_id>.jpg.
+	@param user_id: Facebook ID of user we want to get profile picture of
+"""
+def get_profile_picture(user_id):
+	if PERSON_DATA[user_id]['picture_url'] is not None:
+		# Extract extension of image.
+		# Extension is probably always ".jpg" but still better to be robust.
+		_, temp_extension = PERSON_DATA[user_id]['picture_url'].rsplit('.', 1)
+		extension, _ = temp_extension.split('?', 1)
+
+		# Get the picture.
+		picture = requests.get(PERSON_DATA[user_id]['picture_url']).content
+
+		# If picture has been found, write it to file. Otherwise log a warning.
+		if picture:
+			with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
+				f.write(picture)
+			return True
+		else:
+			suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \
+				'Couldn\'t load image for user {}'.format(user_id))
+			return False
+
+"""
 	The core of scraping. It scraps all data about a person it can; profile picture,
 	name, date of birth, city of residence, school, relationship status, city of origin.
 	It saves the data to a file and dictionary PERSON_DATA.
@@ -102,7 +126,8 @@ def strigili_princeps(session, user_id, rescrap):
 			'lives_in': None,
 			'from': None,
 			'relationship': None,
-			'friends': []
+			'friends': [],
+			'has_picture': None
 		}
 
 		# Get about page which is located at URL_BASE/user_id/about.
@@ -151,6 +176,9 @@ def strigili_princeps(session, user_id, rescrap):
 		# be written to database.
 		get_friends(session, user_id)
 
+		# Save profile picture of current person to disk. If successful, we need to mark it.
+		PERSON_DATA[user_id]['has_picture'] = get_profile_picture(user_id)
+
 		# Save data to database. Create new object if it has not been found.
 		if not user_data:
 			user_data = UserData()
@@ -161,6 +189,7 @@ def strigili_princeps(session, user_id, rescrap):
 		user_data.comes_from = PERSON_DATA[user_id]['from']
 		user_data.study = PERSON_DATA[user_id]['study']
 		user_data.picture_url = PERSON_DATA[user_id]['picture_url']
+		user_data.has_saved_picture = PERSON_DATA[user_id]['has_picture']
 	    # TODO user_data.married = PERSON_DATA[user_id]['married']
 	    # TODO user_data.in_relationship = PERSON_DATA[user_id]['relationship']
 		user_data.save()
@@ -182,7 +211,8 @@ def strigili_princeps(session, user_id, rescrap):
 			'lives_in': user_data.lives_in,
 			'from': user_data.comes_from,
 			'relationship': None,
-			'friends': list(Friendship.objects.filter(user1=user_id).values_list('user2', flat=True))
+			'friends': list(Friendship.objects.filter(user1=user_id).values_list('user2', flat=True)),
+			'has_picture': user_data.has_saved_picture
 		}
 
 		# Add user_id to PEOPLE_DISCOVERED.
@@ -192,28 +222,6 @@ def strigili_princeps(session, user_id, rescrap):
 		# we cannot loop through their friends, potentially resulting in program not
 		# working if do not reload data.
 		PEOPLE_DISCOVERED.update(PERSON_DATA[user_id]['friends'])
-
-"""
-	Gets profile picture and saves it to DIR_DATA_IMAGES as <user_id>.jpg.
-	@param user_id: Facebook ID of user we want to get profile picture of
-"""
-def get_profile_picture(user_id):
-	if PERSON_DATA[user_id]['picture_url'] is not None:
-		# Extract extension of image.
-		# Extension is probably always ".jpg" but still better to be robust.
-		_, temp_extension = PERSON_DATA[user_id]['picture_url'].rsplit('.', 1)
-		extension, _ = temp_extension.split('?', 1)
-
-		# Get the picture.
-		picture = requests.get(PERSON_DATA[user_id]['picture_url']).content
-
-		# If picture has been found, write it to file. Otherwise log a warning.
-		if picture:
-			with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
-				f.write(picture)
-		else:
-			suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \
-				'Couldn\'t load image for user {}'.format(user_id))
 
 """
 	Main function, called from view.
@@ -290,7 +298,6 @@ def strigili(username, password, depth, roots, rescrap):
 				if DEBUG:
 					print 'Getting data for {}'.format(user_id)
 				strigili_princeps(s, user_id, rescrap)
-				get_profile_picture(user_id)
 				number_of_people_through_sp += 1
 
 		print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)

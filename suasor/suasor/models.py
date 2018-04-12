@@ -35,3 +35,4 @@ class UserData(models.Model):
     picture_url = models.TextField(blank=True, null=True)
     married = models.NullBooleanField()
     in_relationship = models.NullBooleanField()
+    has_saved_picture = models.BooleanField(default=False)

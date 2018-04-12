@@ -229,80 +229,88 @@ def strigili_princeps(session, user_id, rescrap):
 	@return None if wrong credentials, False if failed to create dirs, else number of scrapped people
 """
 def strigili(username, password, depth, roots, rescrap):
-	# Data that needs to be passed in Facebook login form. It might not all be needed
-	# but better safe than sorry.
-	LOGIN_FORM_DATA = {
-		'lsd': 'AVoWxZto',
-		'email': username,
-		'pass': password,
-		'timezone': -60,
-		'lgndim': 'eyJ3IjoxNDQwLCJoIjo5MDAsImF3IjoxNDQwLCJhaCI6ODc0LCJjIjoyNH0=',
-		'lgnrnd': '005012__T_v',
-		'lgnjs': 1516870214,
-		'ab_test_data': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-		'locale': 'en_US',
-		'login_source': 'login_bluebar',
-		'prefill_contact_point': username,
-		'prefill_source': 'browser_dropdown',
-		'prefill_type': 'password',
-		'skstamp': 'eyJyb3VuZHMiOjUsInNlZWQiOiI2ZDAxZDcwZjIwZjkyNWU1OTA2ZDY2ZWUwOTQ2ODM4YyIsInNlZWQyIjoiNjllYTg2MjhkODMyMGUyNmIxNDNhOTkwNjFmMmY4ZDgiLCJoYXNoIjoiM2I4OWZlMTk5OGJmNjEwYzllNjI1ZjNkMTQ4YzhjOTIiLCJoYXNoMiI6IjBjMjU4ZjU5NmI5NGYyNGU0MDMwZGQ1MWZiMDJiODlhIiwidGltZV90YWtlbiI6ODQ4MDAsInN1cmZhY2UiOiJsb2dpbiJ9'
-	}
+	# Put whole function into try - except block because of potential errors. Might not need
+	# to put whole function inside, but why not.
+	try:
+		# Data that needs to be passed in Facebook login form. It might not all be needed
+		# but better safe than sorry.
+		LOGIN_FORM_DATA = {
+			'lsd': 'AVoWxZto',
+			'email': username,
+			'pass': password,
+			'timezone': -60,
+			'lgndim': 'eyJ3IjoxNDQwLCJoIjo5MDAsImF3IjoxNDQwLCJhaCI6ODc0LCJjIjoyNH0=',
+			'lgnrnd': '005012__T_v',
+			'lgnjs': 1516870214,
+			'ab_test_data': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+			'locale': 'en_US',
+			'login_source': 'login_bluebar',
+			'prefill_contact_point': username,
+			'prefill_source': 'browser_dropdown',
+			'prefill_type': 'password',
+			'skstamp': 'eyJyb3VuZHMiOjUsInNlZWQiOiI2ZDAxZDcwZjIwZjkyNWU1OTA2ZDY2ZWUwOTQ2ODM4YyIsInNlZWQyIjoiNjllYTg2MjhkODMyMGUyNmIxNDNhOTkwNjFmMmY4ZDgiLCJoYXNoIjoiM2I4OWZlMTk5OGJmNjEwYzllNjI1ZjNkMTQ4YzhjOTIiLCJoYXNoMiI6IjBjMjU4ZjU5NmI5NGYyNGU0MDMwZGQ1MWZiMDJiODlhIiwidGltZV90YWtlbiI6ODQ4MDAsInN1cmZhY2UiOiJsb2dpbiJ9'
+		}
 
-	# Get custom search roots if supplied.
-	_custom_search_roots = None
-	if roots:
-		_custom_search_roots = roots.split(',')
-		if DEBUG:
-			print 'SEARCH ROOTS = {}'.format(_custom_search_roots)
-
-	# Everything has to be done in one session so we do not lose login.
-	with requests.session() as s:
-		# Get session cookie.
-		s.get(URL_BASE)
-
-		if DEBUG:
-			print 'Loging in...'
-		# Login.
-		r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
-
-		if not is_valid_login(r.text):
+		# Get custom search roots if supplied.
+		_custom_search_roots = None
+		if roots:
+			_custom_search_roots = roots.split(',')
 			if DEBUG:
-				print 'Failed to login!'
-			return HttpResponse("Login Error: Wrong Facebook credentials.")
-		if DEBUG:
-			print 'Login successful!'
+				print 'SEARCH ROOTS = {}'.format(_custom_search_roots)
 
-		# Save the page to file for debugging purposes.
-		if DEBUG:
-			with open(os.path.join(DIR_DATA_DEBUG, '_facebook.html'), 'w') as f:
-				f.write(r.text.encode('utf8'))
-			suasor.auxilium._log('DEBUG', 'strigili', 'strigili', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
+		# Everything has to be done in one session so we do not lose login.
+		with requests.session() as s:
+			# Get session cookie.
+			s.get(URL_BASE)
 
-		# Add your ID to PEOPLE_DISCOVERED as a starting point for search if no custom search
-		# roots have been specified.
-		if _custom_search_roots:
-			PEOPLE_DISCOVERED.update(_custom_search_roots)
-		else:
-			my_id = get_your_id(r.text.encode('utf8'))
-			PEOPLE_DISCOVERED.add(my_id)
+			if DEBUG:
+				print 'Loging in...'
+			# Login.
+			r = s.post(URL_POST_LOGIN, LOGIN_FORM_DATA)
 
-		if DEBUG:
-			print 'PEOPLE_DISCOVERED = {}'.format(PEOPLE_DISCOVERED)
-
-		# Get friends to desired depth. Depth + 1 because on depth 0 is the head, that is you.
-		number_of_people_through_sp = 0
-		for i in range(depth+1):
-			# Get profile pages of every person we discovered and extract the data
-			# we can get (profile pic, name, date of birth, city, institutes, etc.).
-			for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
+			if not is_valid_login(r.text):
 				if DEBUG:
-					print 'Getting data for {}'.format(user_id)
-				strigili_princeps(s, user_id, rescrap)
-				number_of_people_through_sp += 1
+					print 'Failed to login!'
+				return HttpResponse("Login Error: Wrong Facebook credentials.")
+			if DEBUG:
+				print 'Login successful!'
 
-		print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)
-		print '\n======================================================\n'
-		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))
+			# Save the page to file for debugging purposes.
+			if DEBUG:
+				with open(os.path.join(DIR_DATA_DEBUG, '_facebook.html'), 'w') as f:
+					f.write(r.text.encode('utf8'))
+				suasor.auxilium._log('DEBUG', 'strigili', 'strigili', 'Main Facebook page saved to: ' + str(os.path.join(DIR_DATA_DEBUG, '_facebook.html')))
+
+			# Add your ID to PEOPLE_DISCOVERED as a starting point for search if no custom search
+			# roots have been specified.
+			if _custom_search_roots:
+				PEOPLE_DISCOVERED.update(_custom_search_roots)
+			else:
+				my_id = get_your_id(r.text.encode('utf8'))
+				PEOPLE_DISCOVERED.add(my_id)
+
+			if DEBUG:
+				print 'PEOPLE_DISCOVERED = {}'.format(PEOPLE_DISCOVERED)
+
+			# Get friends to desired depth. Depth + 1 because on depth 0 is the head, that is you.
+			number_of_people_through_sp = 0
+			for i in range(depth+1):
+				# Get profile pages of every person we discovered and extract the data
+				# we can get (profile pic, name, date of birth, city, institutes, etc.).
+				for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
+					if DEBUG:
+						print 'Getting data for {}'.format(user_id)
+					strigili_princeps(s, user_id, rescrap)
+					number_of_people_through_sp += 1
+
+			print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)
+			print '\n======================================================\n'
+			return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))
+
+	# If exception of some sort happens, log it to database and restart strigili.
+	except Exception as e:
+		suasor.auxilium._log('ERROR', 'strigili', 'strigili', e.message)
+		strigili(username, password, depth, roots, rescrap)
 
 """
     Extend threading.Thread to remember the number of processed people.

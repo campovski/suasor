@@ -194,28 +194,26 @@ def strigili_princeps(session, user_id, rescrap):
 		PEOPLE_DISCOVERED.update(PERSON_DATA[user_id]['friends'])
 
 """
-	Gets all profile pictures and saves them to DIR_DATA_IMAGES as <user_id>.jpg.
+	Gets profile picture and saves it to DIR_DATA_IMAGES as <user_id>.jpg.
+	@param user_id: Facebook ID of user we want to get profile picture of
 """
-def get_profile_pictures():
-	number_of_people = len(PERSON_DATA)
-	for i, user_id in enumerate(PERSON_DATA):
-		if PERSON_DATA[user_id]['picture_url'] is not None:
-			# Extract extension of image.
-			# Extension is probably always ".jpg" but still better to be robust.
-			_, temp_extension = PERSON_DATA[user_id]['picture_url'].rsplit('.', 1)
-			extension, _ = temp_extension.split('?', 1)
+def get_profile_picture(user_id):
+	if PERSON_DATA[user_id]['picture_url'] is not None:
+		# Extract extension of image.
+		# Extension is probably always ".jpg" but still better to be robust.
+		_, temp_extension = PERSON_DATA[user_id]['picture_url'].rsplit('.', 1)
+		extension, _ = temp_extension.split('?', 1)
 
-			# Get the picture.
-			picture = requests.get(PERSON_DATA[user_id]['picture_url']).content
+		# Get the picture.
+		picture = requests.get(PERSON_DATA[user_id]['picture_url']).content
 
-			# If picture has been found, write it to file. Otherwise log a warning.
-			if picture:
-				with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
-					f.write(picture)
-			else:
-				suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \
-					'Couldn\'t load image for user {}'.format(user_id))
-
+		# If picture has been found, write it to file. Otherwise log a warning.
+		if picture:
+			with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
+				f.write(picture)
+		else:
+			suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \
+				'Couldn\'t load image for user {}'.format(user_id))
 
 """
 	Main function, called from view.
@@ -288,22 +286,13 @@ def strigili(username, password, depth, roots, rescrap):
 		for i in range(depth+1):
 			# Get profile pages of every person we discovered and extract the data
 			# we can get (profile pic, name, date of birth, city, institutes, etc.).
-			# Search only through people that are not you to save some time because I
-			# guess you are not searching for yourself or your dummy profile.
 			for user_id in [uid for uid in PEOPLE_DISCOVERED if uid not in PERSON_DATA]:
 				if DEBUG:
 					print 'Getting data for {}'.format(user_id)
 				strigili_princeps(s, user_id, rescrap)
+				get_profile_picture(user_id)
 				number_of_people_through_sp += 1
 
-		# Now that we hopefully have all data extracted, we can get the profile pictures.
-		# Maybe it is better to get profile pictures as we search for people and at the same time
-		# run analysis in separate thread so that we can stop scraping data if we already find a match.
-		# For now, we will scrap all data first, then get profile pictures and at the end return the top
-		# matches, so not only the best match, but potential matches.
-		if DEBUG:
-			print 'Getting profile pictures...'
-		get_profile_pictures()
 		print 'FINISHED! Processed {} people.'.format(number_of_people_through_sp)
 		print '\n======================================================\n'
 		return HttpResponse("Strigili has processed {} people.".format(number_of_people_through_sp))

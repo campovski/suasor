@@ -4,6 +4,9 @@
 
 # Omit generated files
 indicina/
+
+# For now omit migrations
+migrations/
 ################################################################################
 
 # Byte-compiled / optimized / DLL files

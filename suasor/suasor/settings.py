@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'suasor',
     'strigili',
     'praedicto',
+    'authenticas',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -118,5 +119,8 @@ DIR_DATA_DEBUG = os.path.join(DIR_DATA, 'tmp')
 DIR_DATA_PEOPLE = os.path.join(DIR_DATA, 'persona')
 DIR_DATA_IMAGES = os.path.join(DIR_DATA, 'imaginibus')
 DIR_DATA_LOG = os.path.join(DIR_DATA, 'diarium')
+
+# HTTP address of main page
+BASE_HTTP_ADDRESS = 'localhost:8000/praeparo'
 
 from local_settings import *

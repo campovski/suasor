@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^strigili/', include('strigili.urls')),
     url(r'^praedicto/', include('praedicto.urls')),
+    url(r'^authenticas/', include('authenticas.urls'))
 ]

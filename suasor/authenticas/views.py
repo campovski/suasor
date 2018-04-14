@@ -20,7 +20,7 @@ def index(request):
             password = form.cleaned_data['password']
             if validate_login(user_id, password):
                 request.session['user'] = user_id
-                return redirect(BASE_HTTP_ADDRESS)
+                return redirect('praedicto:index')
             else:
                 return render(request, 'authenticas/index.html', { 'form': form, 'valid': False })
     else:

@@ -22,7 +22,7 @@ class Rating(models.Model):
     user1 = models.TextField()
     user2 = models.TextField()
     grade = models.NullBooleanField()
-    trainset = models.NullBooleanField()
+    trainset = models.NullBooleanField() # Denotes whether grade was inserted during training.
 
 
 class UserData(models.Model):

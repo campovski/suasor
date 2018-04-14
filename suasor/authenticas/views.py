@@ -22,8 +22,8 @@ def index(request):
                 return redirect(BASE_HTTP_ADDRESS)
             else:
                 return render(request, 'authenticas/index.html', { 'form': form, 'valid': False })
-        else:
-            form = SuasorLoginForm()
+    else:
+        form = SuasorLoginForm()
     return render(request, 'authenticas/index.html', { 'form': form, 'valid': True })
 
 def signup(request):
@@ -47,6 +47,6 @@ def signup(request):
                 return redirect(BASE_HTTP_ADDRESS)
             else:
                 return render(request, 'authenticas/signup.html', { 'form': form, 'valid': False })
-        else:
-            form = SuasorSignupForm()
+    else:
+        form = SuasorSignupForm()
     return render(request, 'authenticas/signup.html', { 'form': form, 'valid': True })

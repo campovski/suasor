@@ -8,12 +8,17 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
   <script src="{% static 'js/train.js' %}"></script>
+  <script type="text/javascript">
+    window.onload = function() {
+      gradeNext(0, {{ trainset_size }}, 0);
+    }
+  </script>
 </head>
 
 <body>
   <div class="content">
     {% for user in trainset %}
-      <div id="{{ foorloop.counter }}" class="userWrapper">
+      <div id="{{ foorloop.counter }}" class="userWrapper" style="display: none;">
         <div class="imgWrapper">
           <img src="img/{{ user.user_id }}.jpg" alt="image">
         </div>
@@ -47,14 +52,13 @@
           <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" />
           <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" />
         </div>
-
-        <div id="finishBlock">
-          <p>You have successfully completed grading! Now it is up to Praedicto and its magic to
-            find people for you. ;)</p>
-          <button id="finishBtn" onclick="finishGrading({{ user_id }});" />
-        </div>
       </div>
     {% endfor %}
+    <div id="finishBlock" style="display: none;">
+      <p>You have successfully completed grading! Now it is up to Praedicto and its magic to
+        find people for you. ;)</p>
+      <button id="finishBtn" onclick="finishGrading({{ user_id }});" />
+    </div>
   </div>
 </body>
 

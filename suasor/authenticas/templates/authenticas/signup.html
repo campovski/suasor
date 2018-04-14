@@ -14,13 +14,13 @@
 		<div id="content">
 			<div id="login_logo">
 				<h1>Suasor</h1>
-				<p>Log in</p>
+				<p>Sign up</p>
 			</div>
 			<div id="login_form">
 				<form method="POST">
 					{% csrf_token %}
 					{{ form }}
-					<input type="submit" value="Login">
+					<input type="submit" value="Signup">
 					<input type="button" value="Home" onclick="location.href = '{% url 'strigili:index' %}';">
 				</form>
 				{% if valid == False %}

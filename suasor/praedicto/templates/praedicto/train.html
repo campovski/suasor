@@ -1,0 +1,61 @@
+<html>
+
+{% load static %}
+
+<head>
+	<meta charset="utf-8">
+	<title>Suasor -- Train Praedicto</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
+  <script src="{% static 'js/train.js' %}"></script>
+</head>
+
+<body>
+  <div class="content">
+    {% for user in trainset %}
+      <div id="{{ foorloop.counter }}" class="userWrapper">
+        <div class="imgWrapper">
+          <img src="img/{{ user[0].user_id }}.jpg">
+        </div>
+
+        <div class="dataWrapper">
+          <table>
+            <tr>
+              <td>Name</td>
+              <td>{{ user[0].name }}</td>
+            </tr>
+            <tr>
+              <td>Comes from</td>
+              <td>{{ user[0].comes_from }}</td>
+            </tr>
+            <tr>
+              <td>Lives in</td>
+              <td>{{ user[0].lives_in }}</td>
+            </tr>
+            <tr>
+              <td>Birthday</td>
+              <td>{{ user[0].birthday }}</td>
+            </tr>
+            <tr>
+              <td>Studies</td>
+              <td>{{ user[0].study }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="decideGradeWrapper">
+          <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" />
+          <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" />
+        </div>
+
+        <div id="finishBlock">
+          <p>You have successfully completed grading! Now it is up to Praedicto and its magic to
+            find people for you. ;)</p>
+          <button id="finishBtn" onclick="finishGrading({{ user_id }});" />
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+
+</html>

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 from suasor.settings import BASE_HTTP_ADDRESS
 from .forms import SuasorLoginForm, SuasorSignupForm
+from .auxilium import validate_login, signup_user
 
 
 def index(request):

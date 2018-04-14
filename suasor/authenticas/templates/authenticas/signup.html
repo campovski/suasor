@@ -1,0 +1,37 @@
+<html>
+
+{% load static %}
+
+<head>
+	<meta charset="utf-8">
+	<title>Suasor -- Signup</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
+</head>
+
+<body>
+	<div id="page">
+		<div id="content">
+			<div id="login_logo">
+				<h1>Suasor</h1>
+				<p>Log in</p>
+			</div>
+			<div id="login_form">
+				<form method="POST">
+					{% csrf_token %}
+					{{ form }}
+					<input type="submit" value="Login">
+					<input type="button" value="Home" onclick="location.href = '{% url 'strigili:index' %}';">
+				</form>
+				{% if valid == False %}
+					<p class="error">Passwords do not match.</p>
+				{% endif %}
+				{% if valid is None %}
+					<p class="error">You are already registered!</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

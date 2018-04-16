@@ -32,7 +32,7 @@ def can_continue_grading(user_id):
 def get_train_set(user_id, retrain):
     # If user wants to start training from beginning, delete his grades and get
     # new trainset.
-    if retrain:
+    if retrain == "True":
         delete_grades(user_id)
 
         users = list(UserData.objects.all())
@@ -64,7 +64,11 @@ def get_train_set(user_id, retrain):
 
     else:
         # If user will continue training, then get the users he has not rated yet.
-        train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
+        train = []
+        ratings_to_complete = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True)
+        for rating in ratings_to_complete:
+            train.append(UserData.objects.get(user_id=rating.user2))
+        train.sort(key=lambda x: x.user_id)
 
     return train
 

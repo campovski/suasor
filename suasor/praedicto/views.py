@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-from .auxilium import get_train_set, save_train_grades, TRAIN_SET_SIZE
+from .auxilium import get_train_set, save_train_grades, can_continue_grading
 
 
 def index(request):
@@ -13,7 +13,11 @@ def index(request):
 
     # Check if user can continue grading.
     can_continue = can_continue_grading(user_id)
-    return render(request, 'praedicto/index.html', { 'can_continue_grading': can_continue })
+    content = {
+        'can_continue_grading': can_continue,
+        'user_id': user_id
+    }
+    return render(request, 'praedicto/index.html', content)
 
 def train(request, user_id_rated=None, grades=None, retrain=False):
     if user_id_rated is None:

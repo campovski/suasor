@@ -17,7 +17,7 @@ def get_train_set(user_id, retrain):
 
     # Check if user has already started rating and has not completed it.
     # If so, load his set of people, limited to people he has not rated yet.
-    train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None)
+    train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
 
     # New rating round. Get list of random people of length TRAIN_SET_SIZE.
     if not train:
@@ -58,7 +58,7 @@ def get_train_set(user_id, retrain):
 def save_train_grades(user_id, ts_grades):
     # Get people that user_id has graded. Filter to those that has not been graded in any
     # possible previous grading.
-    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None).order_by('user2')
+    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
     assert len(ratings) == len(ts_grades), "Number of ratings does not match the number \
         in database."
 

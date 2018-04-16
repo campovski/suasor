@@ -107,18 +107,22 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 # Directories, used mainly for debugging (except imaginibus)!
 DIR_DATA = os.path.join(BASE_DIR, 'indicina')
 DIR_DATA_DEBUG = os.path.join(DIR_DATA, 'tmp')
 DIR_DATA_PEOPLE = os.path.join(DIR_DATA, 'persona')
 DIR_DATA_IMAGES = os.path.join(DIR_DATA, 'imaginibus')
 DIR_DATA_LOG = os.path.join(DIR_DATA, 'diarium')
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    DIR_DATA_IMAGES
+]
 
 # HTTP address of main page
 BASE_HTTP_ADDRESS = 'localhost:8000/praeparo'

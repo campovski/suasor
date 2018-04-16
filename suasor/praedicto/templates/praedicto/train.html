@@ -1,6 +1,6 @@
 <html>
 
-{% load static %}
+{% load staticfiles %}
 
 <head>
 	<meta charset="utf-8">
@@ -18,9 +18,9 @@
 <body>
   <div class="content">
     {% for user in trainset %}
-      <div id="{{ foorloop.counter }}" class="userWrapper" style="display: none;">
+      <div id="{{ forloop.counter0 }}" class="userWrapper" style="display: none;">
         <div class="imgWrapper">
-          <img src="{% static 'img/'|add:user.user_id|add:'.jpg' %}" alt="Profile image of {{ user.user_id }}">
+          <img src="{% static user.user_id|add:'.jpg' %}" alt="Profile image of {{ user.user_id }}">
         </div>
 
         <div class="dataWrapper">
@@ -49,8 +49,8 @@
         </div>
 
         <div class="decideGradeWrapper">
-          <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" />
-          <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" />
+          <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" value="Yes" />
+          <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" value="No" />
         </div>
       </div>
     {% endfor %}

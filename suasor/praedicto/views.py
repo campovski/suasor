@@ -24,4 +24,4 @@ def train(request, user_id_rated=None, grades=None):
         return render(request, 'praedicto/train.html', content)
     else:
         save_train_grades(user_id_rated, grades)
-        return HttpResponse("Grading completed and save to database!")
+        return HttpResponse("Grading completed and saved to database!")

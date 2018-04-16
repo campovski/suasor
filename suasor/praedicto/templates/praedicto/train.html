@@ -49,15 +49,15 @@
         </div>
 
         <div class="decideGradeWrapper">
-          <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" value="Yes" />
-          <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" value="No" />
+          <button class="decideGrade negative" value="Yes" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" />
+          <button class="decideGrade positive" value="No" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" />
         </div>
       </div>
     {% endfor %}
     <div id="finishBlock" style="display: none;">
       <p>You have successfully completed grading! Now it is up to Praedicto and its magic to
         find people for you. ;)</p>
-      <button id="finishBtn" onclick="finishGrading('{{user_id}}');" />
+      <button id="finishBtn" value="Save" onclick="finishGrading('{{user_id}}');" />
     </div>
   </div>
 </body>

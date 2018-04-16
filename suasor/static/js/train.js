@@ -35,7 +35,7 @@ function gradeNext(idx, maxIdx, grade) {
 */
 function finishGrading(userId) {
   // Create relative URL for GET request.
-  var url = userId + "?" + GRADES;
+  var url = userId + "_" + GRADES;
 
   // Create GET request.
   var xmlHttp = new XMLHttpRequest();

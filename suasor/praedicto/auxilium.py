@@ -53,7 +53,7 @@ def save_train_grades(user_id, ts_grades):
 
     # Fill grade column.
     for i in range(len(ratings)):
-        ratings[i].grade = bool(int(ts_grade[i]))
+        ratings[i].grade = bool(int(ts_grades[i]))
         ratings[i].save()
 
 """

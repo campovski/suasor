@@ -20,7 +20,7 @@
     {% for user in trainset %}
       <div id="{{ foorloop.counter }}" class="userWrapper" style="display: none;">
         <div class="imgWrapper">
-          <img src="img/{{ user.user_id }}.jpg" alt="image">
+          <img src="{% static 'img/'|add:user.user_id|add:'.jpg' %}" alt="Profile image of {{ user.user_id }}">
         </div>
 
         <div class="dataWrapper">

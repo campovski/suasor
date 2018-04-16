@@ -10,33 +10,43 @@ TRAIN_SET_SIZE = 100
     @param user_id: Facebook ID of user that requested the search
     @return trainset
 """
-def get_train_set(user_id):
-    users = list(UserData.objects.all())
-    n_max = len(users)
-    train = []
+def get_train_set(user_id, retrain):
+    # If user wants to start training from beginning, delete his grades.
+    if retrain:
+        delete_grades(user_id)
 
-    # While we don't have desired number of people, generate new ones.
-    while len(train) < TRAIN_SET_SIZE:
-        user = users[random.randint(1, n_max)]
+    # Check if user has already started rating and has not completed it.
+    # If so, load his set of people, limited to people he has not rated yet.
+    train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None)
 
-        # If user found is not the user that requested the search, we can add
-        # him/her to trainset.
-        if user.user_id != user_id and user not in train:
-            train.append(user)
+    # New rating round. Get list of random people of length TRAIN_SET_SIZE.
+    if not train:
+        users = list(UserData.objects.all())
+        n_max = len(users)
+        train = []
 
-    # Save to database which users were selected for grading. This
-    # simplifies the process of grading, because now that we will sort them,
-    # there will exist a bijection between binary-valued string of length TRAIN_SET_SIZE
-    # and people that user has graded.
-    # Do not save rating.grade, so that we know whether the user has really graded
-    # them or stopped in the middle of the process.
-    train.sort(key=lambda x: x.user_id)
-    for user in train:
-        rating = Rating()
-        rating.user1 = user_id
-        rating.user2 = user.user_id
-        rating.trainset = True
-        rating.save()
+        # While we don't have desired number of people, generate new ones.
+        while len(train) < TRAIN_SET_SIZE:
+            user = users[random.randint(1, n_max)]
+
+            # If user found is not the user that requested the search, we can add
+            # him/her to trainset.
+            if user.user_id != user_id and user not in train:
+                train.append(user)
+
+        # Save to database which users were selected for grading. This
+        # simplifies the process of grading, because now that we will sort them,
+        # there will exist a bijection between binary-valued string of length TRAIN_SET_SIZE
+        # and people that user has graded.
+        # Do not save rating.grade, so that we know whether the user has really graded
+        # them or stopped in the middle of the process.
+        train.sort(key=lambda x: x.user_id)
+        for user in train:
+            rating = Rating()
+            rating.user1 = user_id
+            rating.user2 = user.user_id
+            rating.trainset = True
+            rating.save()
 
     return train
 
@@ -46,8 +56,9 @@ def get_train_set(user_id):
     @param ts_grades: list of grades
 """
 def save_train_grades(user_id, ts_grades):
-    # Get people that user_id has graded.
-    ratings = Rating.objects.filter(user1=user_id).order_by('user_id')
+    # Get people that user_id has graded. Filter to those that has not been graded in any
+    # possible previous grading.
+    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None).order_by('user_id')
     assert len(ratings) == len(ts_grades), "Number of ratings does not match the number \
         in database."
 

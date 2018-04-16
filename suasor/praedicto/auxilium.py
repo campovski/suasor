@@ -79,7 +79,7 @@ def get_train_set(user_id, retrain):
 """
 def save_train_grades(user_id, ts_grades):
     # Get people that user_id has not graded yet.
-    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
+    ratings = list(Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2'))
 
     # Fill grade column. If user has not graded everyone in trainset, some of grades
     # (last ones) will stay null.

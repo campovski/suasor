@@ -1,0 +1,33 @@
+<html>
+
+{% load staticfiles %}
+
+<head>
+	<meta charset="utf-8">
+	<title>Suasor -- Praedicto</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
+  <script src="{% static 'js/train.js' %}"></script>
+</head>
+
+<body>
+  <div class="content">
+    {% if can_continue == None %}
+			<p>Welcome to training, {{ user_id }}! This is your first time here. Once you press "Start",
+				you will be presented with {{ trainset_size }} people, for which you can decide whether
+				you like him/her or not.</p>
+			<button class="startBtn" onclick="location.href='{% url 'praedicto:train' retrain=False %}';">Start</button>
+		{% elif can_continue == False %}
+			<p>Welcome to training, {{ user_id }}! You have already completed the grading process. Do you
+				wish to restart grading?</p>
+			<button class="startBtn" onclick="location.href='{% url 'praedicto:train' retrain=False %}';">Restart</button>
+		{% else %}
+			<p>Welcome to training, {{ user_id }}! You have already started a grading session which you did
+				not complete. Choose, whether you want to continue or start new session.</p>
+			<button class="continueBtn" onclick="location.href='{% url 'praedicto:train' retrain=False %}';">Continue</button>
+			<button class="startBtn" onclick="location.href='{% url 'praedicto:train' retrain=True %}';">Restart</button>
+		{% endif %}
+  </div>
+</body>
+
+</html>

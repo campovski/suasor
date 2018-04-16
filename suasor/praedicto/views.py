@@ -5,7 +5,15 @@ from .auxilium import get_train_set, save_train_grades, TRAIN_SET_SIZE
 
 
 def index(request):
-    return HttpResponse("Praedicto OK")
+    # Require user to be logged in.
+    try:
+        user_id = request.session['user']
+    except KeyError:
+        return redirect('authenticas:index')
+
+    # Check if user can continue grading.
+    can_continue = can_continue_grading(user_id)
+    return render(request, 'praedicto/index.html', { 'can_continue': can_continue })
 
 def train(request, user_id_rated=None, grades=None, retrain=False):
     if user_id_rated is None:

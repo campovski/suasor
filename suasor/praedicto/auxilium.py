@@ -6,21 +6,35 @@ from suasor.models import UserData, Rating
 TRAIN_SET_SIZE = 100
 
 """
+    Checks if user can continue grading or he has completed the grading or has not
+    even started it.
+    @param user_id: Facebook ID of user that will grade
+    @return True if user has incomplete rating session, False if completed, otherwise None
+"""
+def can_continue_grading(user_id):
+    # Get all ratings of user that belong to trainset.
+    user_trainset_ratings = Rating.objects.filter(user1=user_id).filter(trainset=True)
+
+    # If there are no such ratings, user has not rated anyone yet.
+    if not user_trainset_ratings:
+        return None
+
+    # If there are some ratings with grade null, user can continue grading.
+    if user_trainset_ratings.filter(grade__isnull=True):
+        return True
+    return False
+
+"""
     Get the train set.
     @param user_id: Facebook ID of user that requested the search
     @return trainset
 """
 def get_train_set(user_id, retrain):
-    # If user wants to start training from beginning, delete his grades.
+    # If user wants to start training from beginning, delete his grades and get
+    # new trainset.
     if retrain:
         delete_grades(user_id)
 
-    # Check if user has already started rating and has not completed it.
-    # If so, load his set of people, limited to people he has not rated yet.
-    train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
-
-    # New rating round. Get list of random people of length TRAIN_SET_SIZE.
-    if not train:
         users = list(UserData.objects.all())
         n_max = len(users)
         train = []
@@ -48,6 +62,10 @@ def get_train_set(user_id, retrain):
             rating.trainset = True
             rating.save()
 
+    else:
+        # If user will continue training, then get the users he has not rated yet.
+        train = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
+
     return train
 
 """
@@ -56,14 +74,12 @@ def get_train_set(user_id, retrain):
     @param ts_grades: list of grades
 """
 def save_train_grades(user_id, ts_grades):
-    # Get people that user_id has graded. Filter to those that has not been graded in any
-    # possible previous grading.
+    # Get people that user_id has not graded yet.
     ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade__isnull=True).order_by('user2')
-    assert len(ratings) == len(ts_grades), "Number of ratings does not match the number \
-        in database."
 
-    # Fill grade column.
-    for i in range(len(ratings)):
+    # Fill grade column. If user has not graded everyone in trainset, some of grades
+    # (last ones) will stay null.
+    for i in range(len(ts_grades)):
         ratings[i].grade = bool(int(ts_grades[i]))
         ratings[i].save()
 

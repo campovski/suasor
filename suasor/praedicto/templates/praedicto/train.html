@@ -8,6 +8,11 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/html.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/content.css' %}" />
   <script src="{% static 'js/train.js' %}"></script>
+  <script type="text/javascript">
+    window.onload = function() {
+      gradeNext(0, {{ trainset_size }}, 0);
+    }
+  </script>
 </head>
 
 <body>
@@ -44,15 +49,16 @@
         </div>
 
         <div class="decideGradeWrapper">
-          <button class="decideGrade negative" value="Yes" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);" />
-          <button class="decideGrade positive" value="No" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);" />
+          <button class="decideGrade negative" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 0);">No</button>
+          <button class="decideGrade positive" onclick="gradeNext({{ forloop.counter }}, {{ trainset_size }}, 1);">Yes</button>
         </div>
       </div>
     {% endfor %}
+    <button id="saveBtn" onclick="finishGrading('{{user_id}}');">Save and continue later</button>
     <div id="finishBlock" style="display: none;">
       <p>You have successfully completed grading! Now it is up to Praedicto and its magic to
         find people for you. ;)</p>
-      <button id="finishBtn" value="Save" onclick="finishGrading('{{user_id}}');" />
+      <button id="finishBtn" onclick="finishGrading('{{user_id}}');">Save</button>
     </div>
   </div>
 </body>

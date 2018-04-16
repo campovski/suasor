@@ -14,13 +14,13 @@ function gradeNext(idx, maxIdx, grade) {
     GRADES = GRADES + grade;
 
     // Remove previous person from sight.
-    var previousPersonDiv = document.getElementById((idx-1).toString());
+    var previousPersonDiv = document.getElementById(idx-1);
     previousPersonDiv.style.display = "none";
   }
 
   // Show next one.
   if (idx < maxIdx) {
-    var newPersonDiv = document.getElementById(idx.toString());
+    var newPersonDiv = document.getElementById(idx);
     newPersonDiv.style.display = "inline-block";
   } else {
     var finishDiv = document.getElementById("finishBlock");
@@ -35,7 +35,7 @@ function gradeNext(idx, maxIdx, grade) {
 */
 function finishGrading(userId) {
   // Create relative URL for GET request.
-  var url = userID + "?" + GRADES.toString();
+  var url = userId + "?" + GRADES;
 
   // Create GET request.
   var xmlHttp = new XMLHttpRequest();

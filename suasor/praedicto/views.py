@@ -13,7 +13,7 @@ def index(request):
 
     # Check if user can continue grading.
     can_continue = can_continue_grading(user_id)
-    return render(request, 'praedicto/index.html', { 'can_continue': can_continue })
+    return render(request, 'praedicto/index.html', { 'can_continue_grading': can_continue })
 
 def train(request, user_id_rated=None, grades=None, retrain=False):
     if user_id_rated is None:
@@ -27,8 +27,7 @@ def train(request, user_id_rated=None, grades=None, retrain=False):
         content = {
             'trainset': trainset,
             'trainset_size': len(trainset),
-            'user_id': user_id,
-            'can_continue': len(trainset) == TRAIN_SET_SIZE
+            'user_id': user_id
         }
         return render(request, 'praedicto/train.html', content)
     else:

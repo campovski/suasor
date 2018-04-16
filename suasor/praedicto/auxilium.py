@@ -58,7 +58,7 @@ def get_train_set(user_id, retrain):
 def save_train_grades(user_id, ts_grades):
     # Get people that user_id has graded. Filter to those that has not been graded in any
     # possible previous grading.
-    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None).order_by('user_id')
+    ratings = Rating.objects.filter(user1=user_id).filter(trainset=True).filter(grade=None).order_by('user2')
     assert len(ratings) == len(ts_grades), "Number of ratings does not match the number \
         in database."
 

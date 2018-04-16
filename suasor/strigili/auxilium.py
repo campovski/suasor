@@ -8,7 +8,7 @@ import threading
 
 from django.http import HttpResponse
 
-from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE, DIR_DATA_LOG
+from suasor.settings import DEBUG, DIR_DATA, DIR_DATA_DEBUG, DIR_DATA_IMAGES, DIR_DATA_PEOPLE, DIR_DATA_LOG, STATIC_ROOT
 from suasor.models import Friendship, UserData
 import suasor.auxilium
 
@@ -86,6 +86,11 @@ def get_profile_picture(user_id):
 		if picture:
 			with open(os.path.join(DIR_DATA_IMAGES, '{0}.{1}'.format(user_id, extension)), 'w') as f:
 				f.write(picture)
+			# Currently we also save the same picture for display in praedicto.
+			# TODO remove when scrapping of new picture is implemented.
+			with open(os.path.join(STATIC_ROOT, 'img/{0}.{1}'.format(user_id, extension)), 'w') as f:
+				f.write(picture)
+			# REMOVE UNTIL HERE...
 			return True
 		else:
 			suasor.auxilium._log('WARNING', 'strigili', 'get_profile_pictures', \

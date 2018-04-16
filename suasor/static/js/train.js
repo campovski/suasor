@@ -7,12 +7,16 @@ var GRADES = "";
   @param maxIdx: length of trainset
 */
 function gradeNext(idx, maxIdx, grade) {
-  // Add grade to GRADES.
-  GRADES = GRADES + grade;
+  // If idx = 0, this is when the page loads, meaning we do not have any
+  // user to grade or remove any content.
+  if (idx != 0) {
+    // Add grade to GRADES.
+    GRADES = GRADES + grade;
 
-  // Remove previous person from sight.
-  var previousPersonDiv = document.getElementById((idx-1).toString());
-  previousPersonDiv.style.display = "none";
+    // Remove previous person from sight.
+    var previousPersonDiv = document.getElementById((idx-1).toString());
+    previousPersonDiv.style.display = "none";
+  }
 
   // Show next one.
   if (idx < maxIdx) {
